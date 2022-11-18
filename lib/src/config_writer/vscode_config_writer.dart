@@ -45,8 +45,9 @@ class VscodeConfigWriter extends ConfigWriter {
 
     var dartDefineList = getDartDefineList();
 
-    configJson['configurations'] =
-        configList.map((configMap) => updateConfig(configMap, dartDefineList));
+    configJson['configurations'] = configList
+        .map((configMap) => updateConfig(configMap, dartDefineList))
+        .toList();
 
     return prettifyJson(configJson);
   }
@@ -56,11 +57,30 @@ class VscodeConfigWriter extends ConfigWriter {
     Map<String, dynamic> config,
     Iterable<String> dartDefineList,
   ) {
-    return config.update(
-      'args',
-      (value) => getNonDartDefineArguments(value).followedBy(dartDefineList),
-      ifAbsent: () => dartDefineList,
-    );
+    if (config.containsKey('args')) {
+      clearConfig(config);
+      var args = config['args'] as List;
+      args.addAll(dartDefineList);
+    } else {
+      config['args'] = dartDefineList.toList();
+    }
+    return config;
+  }
+
+  /// Clear dart-define config
+  Map<String, dynamic> clearConfig(Map<String, dynamic> config) {
+    if (config.containsKey('args')) {
+      var args = config['args'] as List;
+      while (args.any((arg) => arg.startsWith('--dart-define'))) {
+        final index = args.indexWhere((arg) => arg == '--dart-define');
+        if (index >= 0) {
+          args.removeRange(index, index + 2);
+        } else {
+          args.removeWhere((arg) => (arg as String).contains('--dart-define'));
+        }
+      }
+    }
+    return config;
   }
 
   /// Pretty Print [json]
