@@ -6,11 +6,13 @@ abstract class ConfigWriter {
   final String projectPath;
   final String dartDefineString;
   final String? configName;
+  final String? programPath;
 
   ConfigWriter({
     required this.projectPath,
     required this.dartDefineString,
     required this.configName,
+    required this.programPath,
   });
 
   List<File> getOptionalFilesToUpdate();

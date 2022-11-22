@@ -16,10 +16,12 @@ class AndroidStudioConfigWriter extends ConfigWriter {
     required String projectPath,
     required String dartDefineString,
     required String? configName,
+    required String? programPath,
   }) : super(
           projectPath: projectPath,
           dartDefineString: dartDefineString,
           configName: configName,
+          programPath: programPath,
         );
 
   @override

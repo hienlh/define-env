@@ -11,6 +11,12 @@ final _argPsr = ArgParser()
     help:
         'File to read.\nProvides environment variable definitions, one per line.',
   )
+  ..addOption(
+    'program',
+    abbr: 'P',
+    defaultsTo: 'lib/main.dart',
+    help: "Program path to use in IDE launch config",
+  )
   ..addFlag(
     'print',
     abbr: 'p',
@@ -85,6 +91,7 @@ void main(List<String> argv) async {
       dartDefineString: dartDefineString,
       configName: opts['config-name'],
       projectPath: '.',
+      programPath: opts['program'],
     ).call();
   }
 
@@ -93,6 +100,7 @@ void main(List<String> argv) async {
       dartDefineString: dartDefineString,
       configName: opts['config-name'],
       projectPath: '.',
+      programPath: opts['program'],
     ).call();
   }
 }

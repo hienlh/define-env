@@ -15,10 +15,12 @@ class VscodeConfigWriter extends ConfigWriter {
     required String projectPath,
     required String dartDefineString,
     required String? configName,
+    required String? programPath,
   }) : super(
           projectPath: projectPath,
           dartDefineString: dartDefineString,
           configName: configName,
+          programPath: programPath,
         );
 
   @override
@@ -37,13 +39,19 @@ class VscodeConfigWriter extends ConfigWriter {
 
     var configJson = jsonDecode(fileContent);
 
-    var configList = (configJson['configurations'] as Iterable);
+    var configList = (configJson['configurations'] as List);
 
-    if (configName != null) {
-      configList = configList.where((config) => config['name'] == configName);
-    }
+    final configMap = configList.firstWhere(
+        (config) => config['name'] == configName,
+        orElse: () => null);
 
     var dartDefineList = getDartDefineList();
+
+    if (configMap != null) {
+      updateConfig(configMap, dartDefineList);
+    } else {
+      configList.add(createConfig(dartDefineList));
+    }
 
     configJson['configurations'] = configList
         .map((configMap) => updateConfig(configMap, dartDefineList))
@@ -65,6 +73,18 @@ class VscodeConfigWriter extends ConfigWriter {
       config['args'] = dartDefineList.toList();
     }
     return config;
+  }
+
+  Map<String, dynamic> createConfig(
+    Iterable<String> dartDefineList,
+  ) {
+    return {
+      'name': configName,
+      'request': 'launch',
+      'type': 'dart',
+      'program': programPath,
+      'args': dartDefineList.toList(),
+    };
   }
 
   /// Clear dart-define config
